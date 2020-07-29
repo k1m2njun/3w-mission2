@@ -1,50 +1,68 @@
+///////////////////////////////////////////////////////////////////////////////////////////// 라이브러리 선언
 #include <stdio.h>
-#include <cs50.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <cs50.h>
+///////////////////////////////////////////////////////////////////////////////////////////// 배열함수 초기화
 const int NUMBER_OF_GRADES = 9;
 const int SCORES[NUMBER_OF_GRADES] = {95, 90, 85, 80, 75, 70, 65, 60, 0};
-const char *GRADES[NUMBER_OF_GRADES] = {"A+", "A ", "B+", "B ", "C+", "C ", "D+", "D ", "F "};
-
+const char *GRADES[NUMBER_OF_GRADES] = {"A+", "A", "B+", "B", "C+", "C", "D+", "D", "F"};
+///////////////////////////////////////////////////////////////////////////////////////////// [][]매개변수화[][] 프로토타입
+void printScores(char *who, const int target[], int length); //점수테이블용 함수
+void printGrades(char *who, const char *target[], int length); //학점테이블용 함수
+char* calculateGrade(int score, const int scores[], const char *grades[], int length);
+///////////////////////////////////////////////////////////////////////////////////////////// 프로그램
 int main(void) {
-    printf("   <학점 계산 프로그램>\n종료를 원하면 '-1'을 입력하세요.");
-    printf("\n점수 : ");
+	printf("학점 프로그램\n종료를 원하면 '999' 를 입력\n[학점 테이블]\n"); ////////////////// 종료 방법 안내 출력
+	printScores("점수", SCORES, NUMBER_OF_GRADES); ////////////////////////////////////////// 점수 테이블 출력
+	printGrades("학점", GRADES, NUMBER_OF_GRADES); ////////////////////////////////////////// 학점 테이블 출력
 
-    for(int i = 0; i < NUMBER_OF_GRADES; i++) {
-        printf("%d     ",SCORES[i]);
-    }
+	while(1) {
+		int score = get_int("성적을 입력하세요 (0 ~ 100) : "); ////////////////////////////// 사용자 점수 입력
 
-    printf("\n학점 : ");
+		if(score == 999) { ////////////////////////////////////////////////////////////////// if 사용자가 999를 입력한면
+			printf("학점 프로그램을 종료합니다.\n"); //////////////////////////////////////// 프로그램 종료 메시지 출력
+			return 0; /////////////////////////////////////////////////////////////////////// 프로그램 종료
+		}
+		else if(score < 0 || score > 100) { ///////////////////////////////////////////////// else if 사용자가 0미만 또는 100초과한 수를 입력하면
+			printf("** %i 성적을 올바르게 입력하세요. 범위는 (0 ~ 100) 입니다.\n", score); // 성적입력 오류 메시지 출력
+		}
+		else { ////////////////////////////////////////////////////////////////////////////// else 사용자가 0미만 또는 100초과한 수, 999를 제외한 수를 입력하면
+			char *grade = calculateGrade(score, SCORES, GRADES, NUMBER_OF_GRADES); ////////// calculateGrade함수를 문자열로 출력
+			printf("학점은 %s 입니다\n", grade); //////////////////////////////////////////// 학점 출력 grade
+		}
+	}
 
-    for(int i = 0; i < NUMBER_OF_GRADES; i++) {
-	    printf("%s     ", GRADES[i]);
-    }
-    
-    int cnt = 0;
-    
-    for(int i = 0; true; i++) {
-        float studentAnswer = get_float("\n성적을 입력하세요. (0 ~ 100) : ");
-        
-        if(studentAnswer == -1) {
-                printf("학점프로그램을 종료합니다.\n");
-                break;
-        }
-        else if(studentAnswer > 100 || studentAnswer < 0 ) {
-                printf("** %.0f 성적을 올바르게 입력하세요. 범위는 (0 ~ 100) 입니다.\n", studentAnswer);
-        }       
-
-        for(int j = 0; j < 10; j++) {
-            
-            if(SCORES[j] > studentAnswer) {
-                cnt++;
-            }
-            else if(studentAnswer >= SCORES[j]) {
-                printf("학점은 %s입니다.",GRADES[cnt]);
-                break;
-            }
-        }
-
-        cnt=0;
-    }
 }
+//////////////////////////////////////////////////////////////////////////////////////////// [][]매개변수화 printScores[][]
+void printScores(char *who, const int target[], int length) {
+	printf("%s : ", who); //////////////////////////// who는 "점수"문자열을 받는다
+
+	for (int i = 0; i < length; i++) { /////////////// 문자열 길이만큼 i회마다
+		printf("%d\t", target[i]); /////////////////// SCORES 배열에서 [i]번째 배열인자 공백문자와 함께 출력
+	}
+	printf("\n"); //////////////////////////////////// 줄바꿈
+}
+//////////////////////////////////////////////////////////////////////////////////////////// [][]매개변수화 printGrades[][]
+void printGrades(char *who, const char *target[], int length) {
+	printf("%s : ", who); //////////////////////////// who는 "학점"문자열을 받는다
+
+	for (int i = 0; i < length; i++) { /////////////// 문자열 길이만큼 i회마다
+		printf("%s\t", target[i]); ////////////////// GRADES 배열에서 [i]번째 배열인자 공백문자와 함께 출력
+	}
+	printf("\n"); //////////////////////////////////// 줄바꿈
+}
+//////////////////////////////////////////////////////////////////////////////////////////// grade 함수
+char* calculateGrade(int score, const int scores[], const char *grades[], int length) {
+	char *grade = NULL;
+
+	for (int i = 0; i < length; i++) {
+		if (score >= scores[i]) { //////////////////////////////// if 입력점수 >= 점수배열인자일때
+			grade = malloc(sizeof(char) * strlen(grades[i])); //// grade에 문자열*배열길이 동적할당
+			strcpy(grade, grades[i]); //////////////////////////// grade, 학점배열인자
+			break;
+		}
+	}
+	return grade;
+}
+////////////////////////////////////////////////////////////////////////////////////////////
